@@ -1,0 +1,106 @@
+{
+  "merchants": [
+    {
+      "wallet": "0x5300000000000000000000000000000000000053",
+      "legalName": "Supplier Gamma Global",
+      "businessJurisdiction": "JP-TYO",
+      "contactEndpoint": "procure@gamma-global.jp",
+      "verificationTier": 2,
+      "isSuspended": false,
+      "totalFulfilledOrders": 42,
+      "totalDisputedOrders": 0
+    },
+    {
+      "wallet": "0x5100000000000000000000000000000000000051",
+      "legalName": "Supplier Alpha Tech",
+      "businessJurisdiction": "US-DE",
+      "contactEndpoint": "contact@supplier-a.com",
+      "verificationTier": 2,
+      "isSuspended": false,
+      "totalFulfilledOrders": 18,
+      "totalDisputedOrders": 0
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "pool_0x24741c",
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "title": "Enterprise Gigabit Router Batch 1",
+      "productDescription": "Enterprise Gigabit Router Batch 1 (Model: Q-RTX-500)",
+      "category": "Electronics",
+      "targetQuantity": 10,
+      "minOrderQuantity": 10,
+      "committedUnits": 10,
+      "maxUnitPrice": 80,
+      "settlementToken": "0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5",
+      "shippingRegion": "GLOBAL",
+      "status": "CLEARED",
+      "clearingPrice": 61,
+      "winningSupplier": "0x5300000000000000000000000000000000000053",
+      "winningSupplierName": "Supplier Gamma Global",
+      "totalDepositedEscrow": 800,
+      "totalRefundsAllocated": 190,
+      "grossOrderValue": 610,
+      "createdAt": "2026-11-09T05:51:43.784Z"
+    }
+  ],
+  "commitments": [
+    {
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "buyer": "0xb1000000000000000000000000000000000000b1",
+      "quantity": 4,
+      "maxUnitPrice": 80,
+      "depositAmount": 320,
+      "refundAmount": 76,
+      "finalLiability": 244
+    },
+    {
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "buyer": "0xb2000000000000000000000000000000000000b2",
+      "quantity": 3,
+      "maxUnitPrice": 80,
+      "depositAmount": 240,
+      "refundAmount": 57,
+      "finalLiability": 183
+    },
+    {
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "buyer": "0xb3000000000000000000000000000000000000b3",
+      "quantity": 3,
+      "maxUnitPrice": 80,
+      "depositAmount": 240,
+      "refundAmount": 57,
+      "finalLiability": 183
+    }
+  ],
+  "bids": [
+    {
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "supplier": "0x5300000000000000000000000000000000000053",
+      "supplierName": "Supplier Gamma Global",
+      "unitPrice": 61,
+      "capacity": 12,
+      "isWinner": true
+    },
+    {
+      "poolId": "0x24741cbbfb257477ca2971bf3c78c9d7556b75748b9ada78d2a3532795a23c11",
+      "supplier": "0x5100000000000000000000000000000000000051",
+      "supplierName": "Supplier Alpha Tech",
+      "unitPrice": 72,
+      "capacity": 15,
+      "isWinner": false
+    }
+  ],
+  "clearings": [],
+  "fulfillments": [],
+  "disputes": [],
+  "fees": [],
+  "metrics": {
+    "totalFundedVolumeQusdc": 0,
+    "totalRefundsClaimedQusdc": 0,
+    "totalSettledOrders": 0,
+    "uniqueBuyersCount": 0,
+    "uniqueSuppliersCount": 2,
+    "lastIndexedBlock": 0
+  }
+}

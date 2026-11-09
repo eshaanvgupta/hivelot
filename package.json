@@ -1,0 +1,37 @@
+{
+  "name": "hivelot-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HIVELOT: The Autonomous Demand Clearing Network on QIE Mainnet",
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "contracts:build": "cd packages/contracts && forge build",
+    "contracts:test": "cd packages/contracts && forge test -vvv",
+    "contracts:invariants": "cd packages/contracts && forge test --match-test Invariant -vvv",
+    "dev:api": "npm run dev --workspace=@hivelot/api",
+    "dev:web": "npm run dev --workspace=@hivelot/web",
+    "dev": "npm run dev:api",
+    "lint": "npm run lint --workspaces --if-present",
+    "verify:clearing": "node scripts/verify/verify-clearing.js",
+    "demo": "node scripts/operations/run-demo.js"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "qie",
+    "reverse-auction",
+    "demand-clearing",
+    "procurement",
+    "defi",
+    "web3-commerce"
+  ],
+  "author": "HIVELOT Core Engineering Team",
+  "license": "MIT"
+}
+
