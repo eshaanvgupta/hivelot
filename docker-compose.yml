@@ -13,3 +13,4 @@ services:
       - QIE_RPC_URL=https://rpc1mainnet.qie.digital/
       - QUSDC_TOKEN_ADDRESS=0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5
     restart: unless-stopped
+

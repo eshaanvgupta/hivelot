@@ -56,3 +56,4 @@ Smart contracts cannot physically inspect postal delivery. HIVELOT bridges this 
 - **Challenge Period & Auto-Acceptance:** If no dispute is lodged within 7 days of documented dispatch, the supplier can invoke auto-acceptance.
 - **Default Penalty:** If the supplier fails to dispatch before the fulfillment deadline, buyers receive a 100% refund of $L_i$, and the supplier's performance bond is forfeited.
 - **Dispute Resolution:** Authorized arbitrators adjudicate disputes via signed verdicts with public on-chain rationale commitments.
+

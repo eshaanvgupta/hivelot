@@ -23,3 +23,4 @@ In accordance with Section 15 and Section 28 (Absolute No-Mock Policy), HIVELOT 
 | **Day 30** | 25 Verified Buyers | 5 Merchants | 10 Campaigns | 25,000 QUSDC | 187.50 QUSDC |
 | **Day 60** | 100 Verified Buyers | 15 Merchants | 50 Campaigns | 120,000 QUSDC | 900.00 QUSDC |
 | **Day 90** | 250 Verified Buyers | 30 Merchants | 100 Campaigns | 350,000 QUSDC | 2,625.00 QUSDC |
+

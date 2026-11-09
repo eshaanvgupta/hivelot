@@ -510,3 +510,4 @@ if (!html.includes('loadJudgePrivateKey')) {
 
 fs.writeFileSync(filePath, html, 'utf8');
 console.log('Successfully updated apps/web/public/index.html with Judge Key Slot and interactive Web3 handlers!');
+

@@ -25,3 +25,4 @@ To maximize near-term traction, HIVELOT prioritizes standardized, non-perishable
 - **IT & Enterprise Hardware:** Routers, switches, docking stations, standardized server peripherals.
 - **Office Equipment & Supplies:** Ergonomic chairs, bulk office paper, high-throughput thermal labels.
 - **Pooled Digital Licensures:** Permitted corporate SaaS seats with group pricing concessions.
+

@@ -33,3 +33,4 @@ The HIVELOT protocol was subjected to comprehensive Foundry invariant and statef
 - **Cross-Chain Replay Attacks:** Commitment hashes explicitly encode `block.chainid`.
 - **Reentrancy Vulnerabilities:** All state transitions follow Checks-Effects-Interactions (CEI) with OpenZeppelin `ReentrancyGuard` and `SafeERC20` transfer wrappers.
 - **Decimal Precision Mismatches:** Standardized on 6 decimals matching canonical QUSDC on QIE Mainnet.
+

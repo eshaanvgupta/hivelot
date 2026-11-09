@@ -17,3 +17,4 @@ COPY packages/sdk ./packages/sdk
 EXPOSE 4000
 
 CMD ["node", "apps/api/src/server.js"]
+

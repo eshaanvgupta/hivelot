@@ -70,3 +70,4 @@ stateDiagram-v2
    Each buyer's price-adjustment refund $R_i$ has a boolean flag `refundWithdrawn` preventing duplicate withdrawals.
 3. **Escrow Solvency:**
    Supplier payouts cannot occur until either explicit buyer acceptance or expiry of the 7-day challenge window following verified dispatch evidence.
+
