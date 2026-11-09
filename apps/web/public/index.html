@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -107,10 +108,19 @@
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           QIE Mainnet: 1990
         </div>
-        <button id="wallet-btn" onclick="toggleWalletConnection()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-bold text-xs hover:brightness-110 transition shadow-lg shadow-cyan-950/50">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          <span id="wallet-label">Connect QIE Wallet</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <!-- Active Mode Pill -->
+          <div id="wallet-status-badge" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
+            <span id="wallet-status-dot" class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <span id="wallet-status-text" class="text-slate-300">Demo Wallet</span>
+          </div>
+
+          <!-- Open Key & Wallet Settings Button -->
+          <button id="wallet-btn" onclick="openWalletModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 text-slate-950 font-extrabold text-xs hover:brightness-110 transition shadow-lg shadow-cyan-950/50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+            <span id="wallet-label">🔑 Key & Wallet Slot</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -569,6 +579,170 @@
     </div>
   </div>
 
+  <!-- Wallet & Judge Key Manager Modal -->
+  <div id="modal-wallet-manager" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="bg-hive-card border border-hive-border rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl glow-cyan">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center pb-3 border-b border-hive-border">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-800 flex items-center justify-center text-cyan-400">
+            🔑
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white tracking-tight">Wallet & Evaluator Key Center</h3>
+            <p class="text-[11px] text-slate-400 font-mono">QIE Mainnet (Chain ID: 1990)</p>
+          </div>
+        </div>
+        <button onclick="closeWalletModal()" class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">&times;</button>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="grid grid-cols-3 gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+        <button id="wtab-btn-judge" onclick="switchWalletTab('judge')" class="py-2 rounded-lg bg-slate-800 text-white font-bold transition flex items-center justify-center gap-1.5">
+          <span>⚖️</span>
+          <span>Judge Key Slot</span>
+        </button>
+        <button id="wtab-btn-web3" onclick="switchWalletTab('web3')" class="py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+          <span>🦊</span>
+          <span>Web3 Extension</span>
+        </button>
+        <button id="wtab-btn-demo" onclick="switchWalletTab('demo')" class="py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+          <span>🧪</span>
+          <span>Demo Sandbox</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: JUDGE / EVALUATOR PRIVATE KEY SLOT -->
+      <div id="wtab-content-judge" class="space-y-4">
+        <!-- Security Notice -->
+        <div class="p-3.5 rounded-xl bg-amber-950/30 border border-amber-900/60 text-xs font-mono space-y-1.5">
+          <div class="flex items-center gap-2 text-amber-400 font-bold">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <span>Client-Side Isolation Guarantee</span>
+          </div>
+          <p class="text-slate-300 text-[11px] leading-relaxed">
+            Your private key remains strictly inside your browser's local memory. It is <strong class="text-white">never</strong> sent across any network, logged, or stored on any server. HIVELOT does not touch or custody your keys.
+          </p>
+        </div>
+
+        <div class="space-y-3 font-mono text-xs">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-slate-300 font-bold">Evaluator Private Key (QIE Mainnet)</label>
+              <button onclick="toggleKeyVisibility()" class="text-[11px] text-cyan-400 hover:underline">Show / Hide</button>
+            </div>
+            <input type="password" id="input-judge-key" placeholder="Paste 0x... or 64-character hex private key" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono text-xs focus:border-cyan-500 focus:outline-none">
+          </div>
+
+          <div id="judge-key-status-card" class="hidden p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2 text-xs font-mono">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Derived Address:</span>
+              <span id="judge-derived-address" class="text-cyan-400 font-bold">0x...</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Native QIE Balance:</span>
+              <span id="judge-qie-balance" class="text-emerald-400 font-bold">0.0000 QIE</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Network RPC:</span>
+              <span class="text-slate-300">https://rpc1mainnet.qie.digital/</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <button onclick="loadJudgePrivateKey()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-bold hover:brightness-110 transition">
+              Activate Key in Session
+            </button>
+            <button onclick="clearJudgePrivateKey()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-bold transition">
+              Clear Key & Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: WEB3 BROWSER EXTENSION -->
+      <div id="wtab-content-web3" class="hidden space-y-4 font-mono text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="text-slate-300 font-bold">Connect Browser Wallet</div>
+          <p class="text-[11px] text-slate-400">Compatible with MetaMask, Rabby, QIE Wallet, or any EIP-1193 Web3 provider.</p>
+        </div>
+
+        <div id="web3-details-box" class="hidden p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Connected Wallet:</span>
+            <span id="web3-connected-addr" class="text-cyan-400 font-bold">0x...</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Active Chain ID:</span>
+            <span id="web3-connected-chain" class="text-emerald-400 font-bold">1990 (QIE Mainnet)</span>
+          </div>
+        </div>
+
+        <button onclick="connectWeb3Extension()" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-bold hover:brightness-110 transition">
+          Connect Extension & Switch to QIE Mainnet
+        </button>
+      </div>
+
+      <!-- TAB 3: DEMO SANDBOX MODE -->
+      <div id="wtab-content-demo" class="hidden space-y-4 font-mono text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="text-slate-300 font-bold">Simulation Sandbox Mode</div>
+          <p class="text-[11px] text-slate-400">Inspect the complete commercial platform, browse demand pools, test the Constellation canvas, and run verification without entering any keys or gas.</p>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+          Default Account: <span class="text-cyan-400 font-bold">0xb1000000000000000000000000000000000000b1</span>
+        </div>
+
+        <button onclick="activateDemoMode()" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition">
+          Activate Demo Sandbox Account
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Register Merchant Identity Modal -->
+  <div id="modal-register-merchant" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="bg-hive-card border border-hive-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl glow-amber">
+      <div class="flex justify-between items-center pb-2 border-b border-hive-border">
+        <div>
+          <h3 class="text-base font-bold text-white">Register Verified Supplier Identity</h3>
+          <p class="text-[11px] text-slate-400 font-mono">MerchantRegistry.sol (QIE Protocol)</p>
+        </div>
+        <button onclick="closeRegisterMerchantModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div class="space-y-3 font-mono text-xs">
+        <div>
+          <label class="text-slate-400 block mb-1">Company / Legal Entity Name</label>
+          <input type="text" id="merchant-name-input" placeholder="e.g. Apex Hardware Solutions LLC" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white">
+        </div>
+        <div>
+          <label class="text-slate-400 block mb-1">Supplier Settlement Wallet</label>
+          <input type="text" id="merchant-wallet-input" placeholder="0x..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 block mb-1">Jurisdiction / Country</label>
+            <input type="text" id="merchant-country-input" value="DE" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Collateral Bond Tier</label>
+            <select id="merchant-tier-input" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white">
+              <option value="1">Tier 1 — 500 QUSDC</option>
+              <option value="2">Tier 2 — 1,000 QUSDC</option>
+              <option value="3">Tier 3 — 2,500 QUSDC</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="submitRegisterMerchant()" class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+          Verify & Register Identity On-Chain
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="glass-card border-t border-hive-border py-6 px-4 text-xs font-mono text-slate-500 text-center">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>HIVELOT © 2026 — The Autonomous Demand Clearing Network (QIE Mainnet Edition)</div>
@@ -581,9 +755,28 @@
 
   <!-- Application Logic & Constellation Engine -->
   <script>
-    // State
+    // State & Network Configuration
+    const QIE_CHAIN_ID = 1990;
+    const QIE_RPC_URL = 'https://rpc1mainnet.qie.digital/';
+    const QUSDC_ADDRESS = '0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5';
+
+    let qieProvider = null;
+    try {
+      if (typeof ethers !== 'undefined') {
+        qieProvider = new ethers.JsonRpcProvider(QIE_RPC_URL, {
+          chainId: QIE_CHAIN_ID,
+          name: 'QIE Mainnet'
+        });
+      }
+    } catch (e) {
+      console.warn('RPC Provider initialization notice:', e);
+    }
+
     let currentTab = 'exchange';
-    let connectedWallet = null;
+    let connectedWallet = '0xb1000000000000000000000000000000000000b1';
+    let walletMode = 'demo'; // 'demo' | 'judge' | 'web3'
+    let judgeWallet = null;
+    let web3Signer = null;
     let campaigns = [];
 
     const API_BASE = window.location.origin;
@@ -911,3 +1104,4 @@
   </script>
 </body>
 </html>
+
