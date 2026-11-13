@@ -1,0 +1,20 @@
+/** Read-only QIE deployment verifier. Accepts a public transaction hash, never a key. */
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {JsonRpcProvider,Contract,ContractFactory,keccak256} from 'ethers';
+const hash=process.argv[2];
+if(!/^0x[a-fA-F0-9]{64}$/.test(hash||''))throw Error('Usage: node scripts/check-deployment.mjs <public-deployment-transaction-hash>');
+const provider=new JsonRpcProvider('https://rpc1mainnet.qie.digital/',1990,{staticNetwork:true});
+assert.equal(parseInt(await provider.send('eth_chainId',[]),16),1990);
+const artifact=JSON.parse(fs.readFileSync('public/protocol/HivelotProtocol.json','utf8'));
+const receipt=await provider.getTransactionReceipt(hash),transaction=await provider.getTransaction(hash);
+assert.ok(receipt&&transaction,'No confirmed transaction found.');assert.equal(receipt.status,1);assert.equal(receipt.to,null);assert.ok(receipt.contractAddress);assert.equal(transaction.value,0n);assert.equal(transaction.chainId,1990n);
+const protocol=new Contract(receipt.contractAddress,artifact.abi,provider);
+assert.equal(await protocol.VERSION(),'2.0.0');
+const token=await protocol.token(),treasury=await protocol.feeRecipient();
+assert.equal(token.toLowerCase(),'0x3f43da82ec9a4f5285f10faf1f26eca7319e5da5');assert.equal(treasury.toLowerCase(),receipt.from.toLowerCase());
+const expected=await new ContractFactory(artifact.abi,artifact.bytecode).getDeployTransaction(token,treasury);
+assert.equal(transaction.data.toLowerCase(),expected.data.toLowerCase(),'Creation bytecode or constructor arguments do not match this release.');
+const tokenContract=new Contract(token,['function decimals() view returns(uint8)','function symbol() view returns(string)'],provider);assert.equal(await tokenContract.decimals(),6n);assert.equal(await tokenContract.symbol(),'QUSDC');
+const result={verified:true,chainId:1990,contractAddress:receipt.contractAddress,transactionHash:hash,deployer:receipt.from,feeRecipient:treasury,settlementToken:token,blockNumber:receipt.blockNumber,creationBytecodeHash:keccak256(artifact.bytecode),runtimeBytecodeHash:keccak256(await provider.getCode(receipt.contractAddress))};
+fs.mkdirSync('outputs',{recursive:true});fs.writeFileSync('outputs/verified-mainnet-deployment.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));

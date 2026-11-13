@@ -1,0 +1,22 @@
+{
+  "verifiedDate": "2026-11-13",
+  "chainId": 1990,
+  "rpcUrl": "https://rpc1mainnet.qie.digital/",
+  "settlementToken": "0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5",
+  "tokenName": "QUSDC",
+  "tokenSymbol": "QUSDC",
+  "tokenDecimals": 6,
+  "issuerConfigurationSource": "https://www.stable.qie.digital/assets/index-Dr3wwzFo.js",
+  "tokenExplorerSource": "https://mainnet.qie.digital/api/v2/tokens/0x3F43DA82eC9A4f5285F10FaF1F26EcA7319E5DA5",
+  "creationBytecodeHash": "0x2bf551bb9a70f6f837c3d96416f123d3259e5b0d1ee8f708f67708f415cd5fd3",
+  "simulationOnly": true,
+  "estimatedDeploymentGas": "2836173",
+  "gasLimitWithTwentyPercentBuffer": "3403407",
+  "gasPriceWeiAtCheck": "1125000000",
+  "maxFeePerGasWeiAtCheck": "2125000000",
+  "estimatedFeeQIEAtCheck": "0.003190694625",
+  "maximumBufferedFeeQIEAtCheck": "0.007232239875",
+  "feeRecipientPolicy": "The connected deployment wallet; no third-party recipient is selected.",
+  "broadcast": false,
+  "blockingRequirement": "The owner has no wallet yet. A wallet, sufficient native QIE on chain 1990, and its transaction signature are required."
+}

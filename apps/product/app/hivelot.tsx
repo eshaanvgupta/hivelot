@@ -1,9 +1,10 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { ArrowUpRight, ArrowRight, ArrowLeft, Plus, Search, Wallet, X, Check, Package, Users, Globe2, LockKeyhole, Clock3, Building2, Activity, ExternalLink, LogOut, Download, Loader2, Send, Network, SlidersHorizontal, CircleHelp, ChevronDown } from 'lucide-react';
-import { BrowserProvider, ContractFactory, Contract, isAddress, formatEther, type InterfaceAbi } from 'ethers';
+import { BrowserProvider } from 'ethers';
 import { CATEGORIES, CHAIN, displayPrice } from '@/lib/protocol';
 import Settlement from './settlement';
+import DeploymentModal from './deployment';
 
 type Account={wallet:string;name:string;region:string;bio:string;supplier:number};
 type Pool={id:string;wallet:string;title:string;description:string;category:string;region:string;target:number;minimum:number;price:string;closes_at:number;created_at:number;status:string;organizer:string;interested_units:number;offer_count:number};
@@ -14,7 +15,6 @@ type Detail={pool:Pool;interest:Interest|null;total:{units:number;buyers:number}
 type Stats={pools:number;suppliers:number;interestedUnits:number;offers:number};
 type Event={id:string;pool_id:string;detail:string;kind:string;wallet:string;created_at:number};
 type Workspace={pools:Pool[];interests:Interest[];offers:Offer[]};
-type Artifact={abi:InterfaceAbi;bytecode:string};
 type Tab='board'|'network'|'workspace'|'suppliers'|'protocol'|'settlement';
 const short=(s:string)=>s?`${s.slice(0,6)}…${s.slice(-4)}`:'Not connected';
 const date=(n:number)=>new Date(n).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
@@ -47,7 +47,7 @@ export default function Hivelot(){
  },[]);
  useEffect(()=>{refresh();const interval=setInterval(refresh,30000);return()=>clearInterval(interval);},[refresh]);
  const loadDetail=useCallback(async(id:string)=>{try{setDetail(await api<Detail>(`pools/${id}`));window.history.replaceState(null,'',`#pool/${id}`);}catch(e){notify((e as Error).message);}},[notify]);
- useEffect(()=>{const hash=window.location.hash;if(hash.startsWith('#pool/'))loadDetail(hash.slice(6));else if(['board','network','workspace','suppliers','protocol','settlement'].includes(hash.slice(1)))setTab(hash.slice(1) as Tab);},[loadDetail]);
+ useEffect(()=>{const hash=window.location.hash;if(hash==='#deploy'){setTab('protocol');setModal('deploy');}else if(hash.startsWith('#pool/'))loadDetail(hash.slice(6));else if(['board','network','workspace','suppliers','protocol','settlement'].includes(hash.slice(1)))setTab(hash.slice(1) as Tab);},[loadDetail]);
  useEffect(()=>{if(tab==='workspace'&&account)api<Workspace>('workspace').then(setWorkspace).catch(e=>notify(e.message));if(tab==='suppliers')api<{suppliers:Account[]}>('suppliers').then(d=>setSuppliers(d.suppliers)).catch(e=>notify(e.message));if(tab==='protocol')api<{events:Event[]}>('activity').then(d=>setEvents(d.events)).catch(e=>notify(e.message));},[tab,account,notify]);
  function navigate(next:Tab){setTab(next);setDetail(null);setFormError('');window.history.replaceState(null,'',`#${next}`);window.scrollTo({top:0,behavior:'smooth'});}
  function requireAuth(next?:'create'|'profile'){if(!account){setModal('wallet');return false;}if(next){setFormError('');setModal(next);}return true;}
@@ -115,22 +115,3 @@ export default function Hivelot(){
  </div>;
 }
 function ArrowDownIcon(){return <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v11m-4-4 4 4 4-4" stroke="currentColor" strokeWidth="1.5"/></svg>;}
-function DeploymentModal({onClose,notify}:{onClose:()=>void;notify:(m:string)=>void}){
- const [error,setError]=useState(''),[busy,setBusy]=useState(false),[estimate,setEstimate]=useState(''),[params,setParams]=useState<{token:string;treasury:string}|null>(null),[deployed,setDeployed]=useState('');
- async function prepare(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);setError('');setEstimate('');setParams(null);try{
-  const f=new FormData(e.currentTarget),token=String(f.get('token')),treasury=String(f.get('treasury'));if(!isAddress(token)||!isAddress(treasury))throw new Error('Enter valid public token and treasury addresses.');
-  const ethereum=(window as unknown as {ethereum?:ConstructorParameters<typeof BrowserProvider>[0]}).ethereum;if(!ethereum)throw new Error('A browser wallet is required. No private keys are accepted.');
-  const provider=new BrowserProvider(ethereum);await provider.send('eth_requestAccounts',[]);const network=await provider.getNetwork();if(network.chainId!==1990n)throw new Error('Switch your wallet to QIE Mainnet, chain ID 1990, then estimate again.');
-  if(await provider.getCode(token)==='0x')throw new Error('No token contract exists at this address on QIE Mainnet.');
-  const tokenContract=new Contract(token,['function decimals() view returns(uint8)','function symbol() view returns(string)'],provider);const decimals=await tokenContract.decimals();if(decimals!==6n)throw new Error('This app expects a six-decimal settlement token. Verify the token address with its issuer.');
-  const artifact=await (await fetch('/protocol/HivelotProtocol.json')).json() as Artifact;const signer=await provider.getSigner();const factory=new ContractFactory(artifact.abi,artifact.bytecode,signer);const deployment=await factory.getDeployTransaction(token,treasury);const gas=await provider.estimateGas({...deployment,from:await signer.getAddress()}),fees=await provider.getFeeData();
-  setEstimate(`${gas.toString()} gas · estimated network cost ${formatEther(gas*(fees.gasPrice||0n))} native QIE. Actual fees can change.`);setParams({token,treasury});
- }catch(e){setError((e as {shortMessage?:string;message:string}).shortMessage||(e as Error).message);}finally{setBusy(false);}}
- async function deploy(){if(!params)return;setBusy(true);setError('');try{
-  const ethereum=(window as unknown as {ethereum:ConstructorParameters<typeof BrowserProvider>[0]}).ethereum,provider=new BrowserProvider(ethereum);
-  if((await provider.getNetwork()).chainId!==1990n)throw new Error('Wallet is no longer on QIE Mainnet.');
-  const artifact=await (await fetch('/protocol/HivelotProtocol.json')).json() as Artifact,factory=new ContractFactory(artifact.abi,artifact.bytecode,await provider.getSigner());
-  const contract=await factory.deploy(params.token,params.treasury);notify('Deployment submitted. Waiting for a real on-chain receipt.');await contract.waitForDeployment();const address=await contract.getAddress();setDeployed(address);setParams(null);
- }catch(e){setError((e as {shortMessage?:string;message:string}).shortMessage||(e as Error).message);}finally{setBusy(false);}}
- return <Modal title="Deploy the settlement contract." eyebrow="OPERATOR SETUP / QIE MAINNET" onClose={onClose}><p className="modal-intro">This publishes a real, immutable contract and spends native QIE for gas. Verify the six-decimal token with its issuer. Tests do not replace an independent security review.</p><form onSubmit={prepare}><FormField label="Verified settlement token address"><input name="token" placeholder="0x…" required autoComplete="off"/></FormField><FormField label="Platform fee recipient address" hint="Pool fees are capped at 2%. The recipient cannot access customer escrow."><input name="treasury" placeholder="0x…" required autoComplete="off"/></FormField><button className="button secondary full" disabled={busy}>{busy?<Loader2 size={16} className="spin"/>:<Activity size={16}/>}Check network & estimate gas</button></form>{estimate&&<div className="estimate-box"><p className="mono">{estimate}</p><p>Token: {params?.token}<br/>Fee recipient: {params?.treasury}</p><button className="button primary full" onClick={deploy} disabled={busy}>Request wallet approval to deploy<ArrowUpRight size={16}/></button></div>}{error&&<p className="form-error" role="alert">{error}</p>}{deployed&&<div className="estimate-box"><strong>Contract deployed</strong><a href={`${CHAIN.explorer}/address/${deployed}`} target="_blank" rel="noreferrer">{deployed}<ExternalLink size={14}/></a><p>Provide this public address to the application operator to activate settlement integration. Deploying alone does not enable payments in this release.</p></div>}<p className="small-copy">Deployment cannot be undone. No transaction is submitted until you click the approval button and confirm in your wallet.</p></Modal>;
-}
