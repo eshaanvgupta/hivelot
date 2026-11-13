@@ -10,5 +10,7 @@
   "persistentDatabase": "Cloudflare D1",
   "mainnetContractAddress": null,
   "mainnetSettlementActive": false,
-  "testDataSeededInProduction": false
+  "testDataSeededInProduction": false,
+  "productionApiAndDatabaseSmokeChecks": "passed",
+  "productionBrowserChecks": "passed at 1440, 768, 390 and 320px"
 }

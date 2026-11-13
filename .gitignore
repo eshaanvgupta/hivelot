@@ -35,4 +35,5 @@ Thumbs.db
 
 # Sites publication checkout (authored source is mirrored in apps/product)
 hosting/
+outputs/
 
