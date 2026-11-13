@@ -1,3 +1,5 @@
+> Historical prototype document. This is not evidence of a deployed or audited mainnet product. See [current release status](../deployment/RELEASE_STATUS.md) and [v2 security review](../security/V2_REVIEW.md).
+
 # QIE Hackathon 3.0 — Official Submission Package
 **2026 Mainnet Edition**
 

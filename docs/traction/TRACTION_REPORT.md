@@ -1,3 +1,5 @@
+> Historical prototype document. This is not evidence of a deployed or audited mainnet product. See [current release status](../deployment/RELEASE_STATUS.md) and [v2 security review](../security/V2_REVIEW.md).
+
 # HIVELOT 90-Day Traction & Operational Milestone Report
 **QIE Hackathon 3.0 — Mainnet Adoption Engine**
 

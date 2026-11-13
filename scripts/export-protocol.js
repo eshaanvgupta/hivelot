@@ -1,0 +1,10 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const source=path.join(root,'packages/contracts/out/HivelotProtocol.sol/HivelotProtocol.json');
+const artifact=JSON.parse(fs.readFileSync(source,'utf8'));
+const destination=path.join(root,'hosting/hivelot/public/protocol');
+fs.mkdirSync(destination,{recursive:true});
+fs.writeFileSync(path.join(destination,'HivelotProtocol.json'),JSON.stringify({abi:artifact.abi,bytecode:artifact.bytecode.object,compiler:'0.8.20',version:'2.0.0'}));
+fs.copyFileSync(path.join(root,'packages/contracts/src/v2/HivelotProtocol.sol'),path.join(destination,'HivelotProtocol.sol'));
+console.log('Exported the compiled v2 ABI, deployment bytecode, and source for the hosted application.');

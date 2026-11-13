@@ -17,7 +17,8 @@
     "demo": "node scripts/operations/run-demo.js"
   },
   "workspaces": [
-    "apps/*",
+    "apps/api",
+    "apps/web",
     "packages/*"
   ],
   "engines": {

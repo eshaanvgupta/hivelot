@@ -33,3 +33,6 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Sites publication checkout (authored source is mirrored in apps/product)
+hosting/
+

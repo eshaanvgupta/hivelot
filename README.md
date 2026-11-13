@@ -1,107 +1,68 @@
-# HIVELOT — The Autonomous Demand Clearing Network
-**QIE Hackathon 3.0 — 2026 Mainnet Edition**
-**Tagline:** Demand together. Compete supply. Clear on-chain.
+# HIVELOT — collective procurement on QIE
 
----
+**Demand together. Compete supply. Clear on-chain.**
 
-## GitHub Pages
+- Application: https://hivelot-network.guppy-ai.chatgpt.site
+- Source: https://github.com/eshaanvgupta/hivelot
+- Frontend and hosted API source: `apps/product/`
+- Settlement contract: `packages/contracts/src/v2/HivelotProtocol.sol`
+- Release evidence and remaining work: [release status](docs/deployment/RELEASE_STATUS.md)
 
-[Open the public frontend preview](https://eshaanvgupta.github.io/hivelot/).
-GitHub Pages hosts the interface; the Express API and settlement services require
-separate hosting. The preview labels example data and blocks unavailable writes.
-See [deployment instructions](docs/deployment/GITHUB_PAGES.md).
+HIVELOT brings buyers together around a product specification. The hosted
+application provides signed wallet authentication, procurement listings, saved
+buyer interest, supplier profiles, private indicative offers, discussion threads,
+and persistent workspaces. Buyer interest is never counted as escrowed demand.
+Empty markets begin empty; the deployment contains no seeded customers or volume.
 
-## 🌟 Executive Summary
+The new design uses warm ivory, burnt orange, and olive with Instrument Serif,
+DM Sans, and IBM Plex Mono. Its custom demand-flow diagram, measured motion,
+consistent layout grid, and responsive controls replace the previous neon theme.
 
-**HIVELOT** is an autonomous multi-sided commerce protocol on QIE Mainnet (Chain ID 1990) that pools fragmented buyer purchasing commitments into verified volume procurement pools. Suppliers compete through sealed-bid commit-reveal auctions with performance bonds. An on-chain `ClearingHouse` deterministically determines the lowest qualifying offer to fix a uniform clearing price, automatically refunds excess deposits to buyers, and safeguards supplier escrow until verified physical fulfillment.
+## Financial settlement
 
----
+The v2 contract implements funded pools, domain-separated commit/reveal supplier
+bids, deterministic clearing, price refunds, delivery acceptance, challenge and
+arbitration timeouts, split decisions, EIP-712 verdicts, fees, and pull withdrawals.
+There is no administrator withdrawal path for customer escrow. The settlement
+desk invokes real contract methods and displays actual transaction hashes.
 
-## 🚀 Key Technological Innovations
+**No QIE mainnet contract has been deployed in this release.** Activation requires
+a funded wallet, a verified six-decimal settlement-token address, a fee-recipient
+address, wallet approval of the deployment, and runtime configuration of the
+deployed addresses. The app includes a deployment and gas-estimation dialog.
+Until activation it accepts no funds. Automated tests are not a security audit.
 
-1. **Demand Formation & Aggregation:** Buyers commit exact unit quantities and deposit token escrow ($D_i = q_i \times M$) into `DemandVault`. Unfunded expressions of interest are never counted.
-2. **Sealed-Bid Supplier Competition:** Cryptographically sealed commitment hashes protect supplier margins until the reveal phase. Performance collateral is escrowed in `SupplierBondVault`.
-3. **Deterministic Clearing Engine:** Mathematical selection of the lowest valid quote meeting the pool's entire demand ($C_s \ge Q$). Non-manipulable timestamp tie-breaking eliminates administrator discretion.
-4. **Immediate Price-Adjustment Refunds:** Excess deposits ($R_i = q_i \times (M - P)$) are immediately credited to withdrawable buyer vaults upon clearing.
-5. **Real-World Fulfillment Verification:** Winning suppliers commit IPFS shipment manifests; escrow release is governed by buyer acceptance, a 7-day challenge window, or EIP-712 multi-sig arbitration.
-6. **The Demand Constellation:** Signature interactive force-directed canvas visualizing live economic flows between buyers, pools, and suppliers.
-7. **HIVE Intelligence:** AI procurement assistant providing natural language guidance and deterministic demand compatibility matching.
+The initial v2 bond policy returns collateral after obligations finish; it does
+not slash suppliers. Dispatch evidence is not cryptographic proof of delivery.
+See [security notes](docs/security/V2_REVIEW.md).
 
----
+## Run and verify
 
-## 🏛️ Smart Contract Architecture
+The independent application has its own lockfile:
 
-The core contracts are written in Solidity (v0.8.20) and compiled with `via-ir`:
+```sh
+cd apps/product
+npm ci --workspaces=false
+npm run dev
+```
 
-- `ProcurementFactory.sol`: Deploys and manages pool lifecycle (FORMING $\rightarrow$ BIDDING $\rightarrow$ REVEALING $\rightarrow$ CLEARED $\rightarrow$ FULFILLING $\rightarrow$ COMPLETED).
-- `DemandVault.sol`: Safely escrows buyer funds, tracks individual balances, guarantees exact token conservation, and processes price-adjustment refunds.
-- `SupplierAuction.sol`: Manages domain-separated sealed bids (`block.chainid`, `address(this)`, `poolId`, `supplier`, `nonce`, `salt`) and reveal verification.
-- `ClearingHouse.sol`: Deterministically calculates the winning supplier, uniform clearing price $P$, buyer refunds, and platform fees.
-- `FulfillmentRegistry.sol`: Tracks dispatch commitments (IPFS CIDs), buyer confirmations, 7-day auto-acceptance timeouts, and supplier default penalties.
-- `DisputeResolver.sol`: Arbitrates contested fulfillments with signed binding verdicts (Buyer Refund, Supplier Payout, or Agreed Split).
-- `SupplierBondVault.sol`: Holds supplier performance collateral; forfeits bond on breach or returns collateral on delivery.
-- `ProtocolTreasury.sol`: Accumulates transparent platform fees (0.75%), strictly separated from customer deposits.
-- `MerchantRegistry.sol`: Stores merchant credentials, verification tiers, and fulfillment track records.
+For binding setup, migrations, hosted builds, and integration tests, read the
+[application README](apps/product/README.md).
 
----
-
-## 🧪 Comprehensive Verification & Test Results
-
-### 1. Foundry Test Suite (100% Passing)
-```bash
+```sh
 cd packages/contracts
-forge test -vv
-```
-**Results:**
-- `testCompleteCollectiveProcurementScenario`: **PASS** (Gas: 3,267,147)
-- `testInvariant_TokenConservationAndSolvency`: **PASS** (Gas: 1,801,307)
-- `testInvariant_NoDoubleRefundWithdrawal`: **PASS** (Gas: 1,830,655)
-- `testInvariant_NoDoubleOrderRelease`: **PASS** (Gas: 1,967,882)
-- `testInvariant_InvalidSupplierCannotWin`: **PASS** (Gas: 1,396,373)
-- `testInvariant_CryptographicCommitmentMismatchReverts`: **PASS** (Gas: 1,148,924)
-- `testInvariant_NoDoubleClearing`: **PASS** (Gas: 1,801,508)
-- `testInvariant_BondVaultAndDemandVaultPartition`: **PASS** (Gas: 1,142,059)
-- `testInvariant_FailedAuctionRecoversBuyerFunds`: **PASS** (Gas: 696,395)
-
-### 2. Independent Clearing Verification Script
-Judges and third parties can mathematically audit any procurement outcome directly:
-```bash
-node scripts/verify/verify-clearing.js
+forge test --match-path test/HivelotV2.t.sol -vv
 ```
 
-### 3. End-to-End Operational Lifecycle Demo
-Simulates full commercial execution:
-```bash
-node scripts/operations/run-demo.js
-```
+The v2 suite contains 19 scenario/fuzz tests plus one stateful conservation test.
+Foundry currently also runs the 19 inherited tests in the invariant test contract;
+the 39 reported passes are not 39 independent scenarios. The invariant runs
+256 sequences / 128,000 calls. Worst-case clearing with 128 active buyers and
+128 bids used 6,188,866 gas in the test environment.
 
----
+## Legacy code
 
-## ⚡ Quickstart & Running the Application
-
-### 1. Launch API & Interactive Web Application
-```bash
-cd apps/api
-npm install
-node src/server.js
-```
-Open **[http://localhost:4000](http://localhost:4000)** in your browser to access:
-- **Live Demand Exchange**
-- **The Demand Constellation**
-- **Buyer Command Center**
-- **Supplier Trading Terminal**
-- **Public Clearing Explorer & Auditor**
-- **HIVE Intelligence AI Assistant**
-- **Traction & Metrics Ledger**
-
----
-
-## 📄 Documentation Package
-
-- [Architecture Specification](docs/architecture/ARCHITECTURE.md)
-- [Protocol Whitepaper](docs/protocol/WHITEPAPER.md)
-- [Security Threat Analysis & Invariants](docs/security/SECURITY.md)
-- [Commercialization & Unit Economics](docs/business/BUSINESS_MODEL.md)
-- [90-Day Traction Ledger](docs/traction/TRACTION_REPORT.md)
-- [Hackathon Submission Package](docs/hackathon/SUBMISSION.md)
-
+`apps/api`, `apps/web/public`, and `packages/contracts/src/core` preserve the
+original prototype for reference. They are not the hosted application or approved
+for mainnet use. The v1 deployment script rejects QIE mainnet and no longer has a
+default public development key. GitHub Pages redirects to the hosted application.

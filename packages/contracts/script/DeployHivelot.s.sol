@@ -15,7 +15,8 @@ import "../src/core/ProcurementFactory.sol";
 
 contract DeployHivelot is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
+        require(block.chainid != 1990, "Legacy v1 contracts are not approved for mainnet; use DeployV2");
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
 
