@@ -2,9 +2,9 @@
   "applicationUrl": "https://hivelot-network.guppy-ai.chatgpt.site",
   "pagesEntryUrl": "https://eshaanvgupta.github.io/hivelot/",
   "projectId": "appgprj_6af6ef34f0e08191bea3ba5c52f5e5e3",
-  "versionId": "appgprj_6af6ef34f0e08191bea3ba5c52f5e5e3~appgver_f10b3ef25b6c8191b14995f9e74b5827",
-  "deploymentId": "appgdep_6af6f8dd24c08191805784512143bde2",
-  "sourceCommit": "ea58fd34820ede4726b8486ae7675ccd1dfa9248",
+  "versionId": "appgprj_6af6ef34f0e08191bea3ba5c52f5e5e3~appgver_6e44c559efcc8191ba4cd07b59dce5fc",
+  "deploymentId": "appgdep_6af72503ee0481919d22de2c5e8198b6",
+  "sourceCommit": "00c707cb7aff40217a50a9332fb4f56a3ccc9cce",
   "deploymentStatus": "succeeded",
   "audience": "public",
   "persistentDatabase": "Cloudflare D1",
@@ -12,5 +12,7 @@
   "mainnetSettlementActive": false,
   "testDataSeededInProduction": false,
   "productionApiAndDatabaseSmokeChecks": "passed",
-  "productionBrowserChecks": "passed at 1440, 768, 390 and 320px"
+  "productionBrowserChecks": "passed at 1440, 768, 390 and 320px",
+  "mainnetDeploymentStatus": "awaiting owner wallet, native gas funding and transaction signature",
+  "guidedDeploymentUrl": "https://hivelot-network.guppy-ai.chatgpt.site/#deploy"
 }
