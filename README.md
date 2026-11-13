@@ -4,6 +4,13 @@
 
 ---
 
+## GitHub Pages
+
+[Open the public frontend preview](https://eshaanvgupta.github.io/hivelot/).
+GitHub Pages hosts the interface; the Express API and settlement services require
+separate hosting. The preview labels example data and blocks unavailable writes.
+See [deployment instructions](docs/deployment/GITHUB_PAGES.md).
+
 ## 🌟 Executive Summary
 
 **HIVELOT** is an autonomous multi-sided commerce protocol on QIE Mainnet (Chain ID 1990) that pools fragmented buyer purchasing commitments into verified volume procurement pools. Suppliers compete through sealed-bid commit-reveal auctions with performance bonds. An on-chain `ClearingHouse` deterministically determines the lowest qualifying offer to fix a uniform clearing price, automatically refunds excess deposits to buyers, and safeguards supplier escrow until verified physical fulfillment.

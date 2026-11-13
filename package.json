@@ -4,7 +4,7 @@
   "private": true,
   "description": "HIVELOT: The Autonomous Demand Clearing Network on QIE Mainnet",
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace=@hivelot/shared && npm run build --workspace=@hivelot/sdk && npm run build --workspace=@hivelot/web",
     "test": "npm run test --workspaces --if-present",
     "contracts:build": "cd packages/contracts && forge build",
     "contracts:test": "cd packages/contracts && forge test -vvv",
